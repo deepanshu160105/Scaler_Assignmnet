@@ -1,6 +1,6 @@
 # 🛒 Amazon Clone — Full-Stack E-Commerce Application
 
-> **Scaler School of Technology — AI Recruitment Assignment**
+> **Scaler AI Labs Assignment**
 >
 > A production-ready, full-stack Amazon India clone built with **React**, **Node.js/Express**, **Prisma ORM**, and **PostgreSQL (Supabase)**.
 
