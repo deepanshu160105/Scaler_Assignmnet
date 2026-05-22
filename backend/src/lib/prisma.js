@@ -1,10 +1,14 @@
 import { PrismaClient } from "@prisma/client";
 
-// Use a singleton pattern to prevent multiple Prisma Client instances
-// in development (due to hot-reloading with nodemon)
+// In serverless environments (Vercel), each invocation may reuse
+// or create a new container. Use a singleton to avoid exhausting connections.
 const globalForPrisma = globalThis;
 
-const prisma = globalForPrisma.prisma ?? new PrismaClient();
+const prisma =
+  globalForPrisma.prisma ??
+  new PrismaClient({
+    log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
+  });
 
 if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;

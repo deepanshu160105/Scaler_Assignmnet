@@ -3,6 +3,7 @@ import { Prisma } from "@prisma/client";
 /**
  * Global error handling middleware.
  * Catches Prisma-specific errors and returns clean JSON responses.
+ * Never exposes internal error details to the client in production.
  */
 export const errorHandler = (err, req, res, next) => {
   console.error("Error:", err);
@@ -28,7 +29,7 @@ export const errorHandler = (err, req, res, next) => {
       default:
         return res.status(400).json({
           success: false,
-          message: `Database error: ${err.message}`,
+          message: "A database error occurred. Please try again.",
         });
     }
   }
@@ -41,10 +42,23 @@ export const errorHandler = (err, req, res, next) => {
     });
   }
 
-  // Default server error
+  // Prisma connection/init errors (e.g., PgBouncer prepared statement issues)
+  if (
+    err instanceof Prisma.PrismaClientInitializationError ||
+    err instanceof Prisma.PrismaClientRustPanicError ||
+    err?.message?.includes("prepared statement") ||
+    err?.message?.includes("ConnectorError")
+  ) {
+    return res.status(503).json({
+      success: false,
+      message: "Database temporarily unavailable. Please try again.",
+    });
+  }
+
+  // Default server error — never expose raw error messages in production
   const statusCode = err.statusCode || 500;
   res.status(statusCode).json({
     success: false,
-    message: err.message || "Internal server error",
+    message: statusCode === 500 ? "Internal server error" : (err.message || "Something went wrong"),
   });
 };
