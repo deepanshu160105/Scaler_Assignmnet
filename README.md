@@ -1,4 +1,5 @@
 # 🛒 Amazon Clone — Full-Stack E-Commerce Application
+# NOTE : CHECK SPAM FOR SIGN UP OTP
 
 > **Scaler AI Labs Assignment**
 >
